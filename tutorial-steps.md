@@ -9,6 +9,7 @@
 6. Add couple of planets
 
 ==Step 2==
+
 7. Add planets manager
 8. Show its benefits on update() method
 9. Make primitive selection logic: click somewhere -> select on hover
@@ -19,5 +20,6 @@
 14. Change size depends of ships amount
 
 ==Step 3==
+
 15. Constructor with "options" param
 16. Regeneration of ships
