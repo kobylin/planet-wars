@@ -23,3 +23,4 @@
 
 15. Constructor with "options" param
 16. Regeneration of ships
+17. Add timer

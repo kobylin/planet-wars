@@ -1,6 +1,6 @@
 "use strict";
 
-var MAX_SHIPS = 200;
+var MAX_CREATE_RATE = 10;
 
 
 var game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
@@ -19,35 +19,45 @@ function preload() {
 
 
 var ship,
-	planet1,
-	planet2,
-	planet3,
-	planet4,
-	planetManager,
-	text,
-	bmd;
+	planetManager;
 
 function create() {
 	ship = new Ship();
 
-	planet1 = new Planet(new Phaser.Point(200, 300), 123);
-	planet1.enemy = true;
+	var planets = [new Planet({
+			point: new Phaser.Point(200, 300),
+			numShips: 100,
+			enemy: true,
+			createRate: 10
+		}),
+		new Planet({
+			point: new Phaser.Point(100, 500),
+			numShips: 20,
+			enemy: true,
+			createRate: 5
+		}),
+		new Planet({
+			point: new Phaser.Point(600, 300),
+			numShips: 5,
+			createRate: 6
+		}), new Planet({
+			point: new Phaser.Point(600, 500),
+			numShips: 30,
+			createRate: 4
+		})
+	];
 
-	planet2 = new Planet(new Phaser.Point(600, 300), 50);
-
-	planet3 = new Planet(new Phaser.Point(600, 500), 125);
-
-	planet4 = new Planet(new Phaser.Point(100, 500), 32);
-	planet4.enemy = true;
-
-	planetManager = new PlanetManager([planet1, planet2, planet3, planet4]);
+	planetManager = new PlanetManager({
+		planets: planets
+	});
 }
 
-function update() {
+function update(e) {
+	// console.log(e.time.elapsed);
 	ship.update();
 	planetManager.update();
 
-	game.debug.text(game.time.fps || '--', 2, 14, 'white', '20px Courier'); 
+	game.debug.text(game.time.fps || '--', 2, 14, 'white', '20px Courier');
 }
 
 
@@ -74,17 +84,19 @@ Ship.prototype.update = function() {
 	}
 }
 
-function Planet(point, numShips) {
-	this.point = point || new Phaser.Point(0, 0);
+//PLANET
+function Planet(options) {
+	this.point = options.point || new Phaser.Point(0, 0);
+	this.enemy = options.enemy || false;
+	this.numShips = options.numShips || 0;
+	this.createRate = options.createRate || 3;
+
 	this.selected = false;
-	this.enemy = false;
 
 	var sprite = this.sprite = game.add.sprite(this.point.x, this.point.y, 'planet');
 	sprite.inputEnabled = true;
 	sprite.frame = 0;
-	sprite.scale.setTo(numShips / MAX_SHIPS);
-
-	this.numShips = numShips;
+	sprite.scale.setTo(this.createRate / MAX_CREATE_RATE);
 
 	this.text = game.add.text(
 		this.point.x + sprite.width / 2,
@@ -113,8 +125,12 @@ Planet.prototype.update = function() {
 	}
 };
 
-function PlanetManager(planets) {
-	this.planets = planets;
+Planet.prototype.createShips = function() {
+	this.numShips += this.createRate;
+}
+
+function PlanetManager(options) {
+	var planets = this.planets = options.planets;
 	var selectionMode = false;
 	var targetPlanet = null;
 
@@ -122,6 +138,12 @@ function PlanetManager(planets) {
 		selectionMode = false;
 		runShips();
 	});
+
+	game.time.events.loop(Phaser.Timer.SECOND / 2, function() {
+		_.each(planets, function(planet) {
+			planet.createShips();
+		});
+	}, this);
 
 	function runShips() {
 		_.each(planets, function(planet) {
@@ -157,6 +179,7 @@ function PlanetManager(planets) {
 	});
 
 }
+
 
 PlanetManager.prototype.update = function() {
 	_.each(this.planets, function(planet) {
