@@ -1,4 +1,4 @@
-==Step 1==
+##### Step 1
 
 0. Setup application
 1. Create single ship(sprites, scale, coords)
@@ -8,7 +8,7 @@
 5. Change planet look on hover
 6. Add couple of planets
 
-==Step 2==
+##### Step 2
 
 7. Add planets manager
 8. Show its benefits on update() method
@@ -19,7 +19,7 @@
 13. Show FPS counter
 14. Change size depends of ships amount
 
-==Step 3==
+##### Step 3
 
 15. Constructor with "options" param
 16. Regeneration of ships
